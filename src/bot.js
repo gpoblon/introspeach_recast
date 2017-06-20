@@ -22,7 +22,7 @@ const client = new recastai(process.env.REQUEST_TOKEN); // Instantiate Recast.AI
  * - callback: Callback is a function called by Recast.AI hosting system when your code will be hosted
  */
 export const bot = (body, response, callback) => {
-	if (body.message) {
+	if (body) {
 		/*
 		* Call the Recast.AI SDK function to handle message from Bot Connector
 		* This function will:
@@ -39,7 +39,7 @@ export const bot = (body, response, callback) => {
 		callback(null, { result: 'Bot answered' });
 	} else if (body.text) {
 		// It just sends text from curl command to Recast.AI and returns replies
-		client.request.converseText(body.text, { conversationToken: process.env.FB_ACCESS_TOKEN || null })
+		client.request.converseText(body.text, { conversationToken: process.env.CONVERSATION_TOKEN || null })
 		.then((res) => {
 			if (res.reply()) { // If response received from Recast.AI contains a reply
 				callback(null, {
@@ -52,10 +52,10 @@ export const bot = (body, response, callback) => {
 					conversationToken: res.conversationToken,
 				});
 			}
-		});
+		})
 		.catch((err) => {
 			callback(err);
-		});
+		})
 	} else {
 		callback('No text provided');
 	}
