@@ -33,11 +33,13 @@ export const bot = (body, response, callback) => {
 		* If you want to edit the behaviour of your code bot, depending on user input,
 		* go to /src/message.js file and write your own code under "YOUR OWN CODE" comment.
 		*/
+		console.log("body");
 		client.connect.handleMessage({ body }, response, replyMessage);
 
 		// This function is called by Recast.AI hosting system when your code will be hosted
 		callback(null, { result: 'Bot answered' });
 	} else if (body.text) {
+		console.log("I SHOULDNT SEE THIS MESSAGE");
 		// It just sends text from curl command to Recast.AI and returns replies
 		client.request.converseText(body.text, { conversationToken: process.env.CONVERSATION_TOKEN || null })
 		.then((res) => {
@@ -47,6 +49,7 @@ export const bot = (body, response, callback) => {
 					conversationToken: res.conversationToken,
 				});
 			} else { // If response received from Recast.AI does not contain any reply
+				console.log("AND HOPEFULLY NEITHER THIS ONE");
 				callback(null, {
 					reply: 'No reply',
 					conversationToken: res.conversationToken,
