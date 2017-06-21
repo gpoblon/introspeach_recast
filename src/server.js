@@ -1,53 +1,47 @@
-/*
- * server.js
- * This file is the core of your bot
- *
- * It creates a little server using express
- * So, your bot can be triggered throught "/" route
- *
- * This file was made for locally testing your bot
- * You can test it by running this command
- * curl -X "POST" "http://localhost:5000" -d '{"text": "YOUR_TEXT"}' -H "Content-Type: application/json; charset=utf-8"
- * You might modify the server port ^^^^  depending on your configuration in config.js file
- */
-
 const express = require('express');
 const bodyParser = require('body-parser');
-
-// Load configuration
+const _ = require('lodash');
+const recastai = require('recastai');
 require('./config');
-const bot = require('./bot').bot;
 
-// Start Express server
-const app = express();
-app.set('port', process.env.PORT || 5000);
+const Facebook = require('./facebook_connect.js');
+const Db = require('./tmp_db');
+
+const app = express()
+const recastRequest = new recastai.request(process.env.REQUEST_TOKEN);
+
+let input = {};
+let standardOutput = require('./standard_output_format.json');
+
+/* Server setup */
+app.set('port', process.env.PORT);
 app.use(bodyParser.json());
 
-// Handle / route
-app.use('/', (request, response) => {
-	// Call bot main function
-	bot(request.body, response, (error, success) => {
-		console.log(request.body);
-		if (error) {
-			console.log('Error in your bot:', error);
-			if (!response.headersSent) {
-				response.sendStatus(400);
-			}
-		} else if (success) {
-			console.log(success);
-			if (!response.headersSent) {
-				response.status(200).json(success);
-			}
-		}
-	});
+app.listen(app.get('port'), () => {
+	console.log('Our bot is running on port', app.get('port'));
 });
 
-if (!process.env.REQUEST_TOKEN.length) {
-	console.log('ERROR: env variable REQUEST_TOKEN has not been set (src/config.js).');
-	process.exit(0);
-} else {
-	// Run Express server, on right port
-	app.listen(app.get('port'), () => {
-    console.log('Our bot is running on port', app.get('port'));
-  });
-}
+app.get('/api/facebook', Facebook.auth);
+
+app.post('/api/facebook', function(req, res) {
+	input = Facebook.getInput(req, res, input);
+	/* ouputObject is filled with either type, text, title, qr_type, qr_text,
+	* url. Whatever you need to output to fb. Read my repo doc to know
+	* how to properly fill this Object
+	*/
+	let outputObject = _.merge(standardOutput, Db.greeting());
+	
+	if(input.text) {
+		Facebook.sendAnswerBack(input.sender, outputObject);
+	}
+	/*
+	recastRequest.analyseText(input.text)
+	.then(function(result) {
+		let recastResult = result;
+		console.log(JSON.stringify(recastResult, null, 4));
+	});*/
+});
+
+// TODO add an action KV string which will define whether a message should be sent randomly, or if several messages are to be sent etc or even if there is an order to send it.
+
+
