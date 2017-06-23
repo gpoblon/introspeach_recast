@@ -13,7 +13,8 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-
+//const mongoose = require('mongoose');
+//mongoose.connect('mongodb://163.172.218.236:3000/introspeach');
 // Load configuration
 require('./config');
 const bot = require('./bot').bot;
@@ -26,8 +27,8 @@ app.use(bodyParser.json());
 // Handle / route
 app.use('/', (request, response) => {
 	// Call bot main function
+	console.log("\n---------------------------------\n")
 	bot(request.body, response, (error, success) => {
-		console.log(request.body);
 		if (error) {
 			console.log('Error in your bot:', error);
 			if (!response.headersSent) {
