@@ -17,24 +17,46 @@ const Db = require('./fill_db');
 const Api = require('./api');
 const Midware = require('./middleware');
 
-function resultToData(data, result, message) {
-	Tools.avoidPronounAndNumber(data, result);
-	console.log("+++++\n./message.result is :\n", JSON.stringify(result, null, 4), "\n");
-	Tools.getData(result, data);
-	data.message = message;
-	data.recast = result;
+function callMiddleware(data) {
+	let middlewareObject = Midware.create(endOfChain);
+
+	Midware.add(runLogicToOutput, middlewareObject);
+	Midware.add(Api.ifChuckJoke, middlewareObject);
+	if (!data.recast.replies.length) { // if recast doesn't fin any reply :my logic
+		Midware.add(isIntent, middlewareObject);
+		Midware.add(isEntity, middlewareObject);
+		Midware.add(isGazette, middlewareObject);
+	} else {
+		Midware.add(getRecastReply, middlewareObject);
+	}
+
+	Midware.run(data, {}, middlewareObject);
 }
+
+/*
+ * PHASE 1 in this function
+ * IE DB connect. Code logic that will be applied whatever happens next
+ */
 
 function runLogicToOutput(data, res, next) {
 	res.addToLog("Entering in my middleware chain...");
 	next(data, res, true);
 }
 
+/*
+ * Use this function only if recast has a reply to send
+ * It's PHASE 2
+*/
 function getRecastReply(data, err, res) {
 	console.log('Reponse par le builder :) : ' + data.recast.replies[0]);
 	data.recast.replies[0] = data.recast.replies[0].replace(/\\n/g, '\n');
 	data.recast.replies.forEach((replyContent) => data.message.addReply({type: 'text', content: replyContent}));
 }
+
+/*
+ * PHASE 2 bis
+ * else, run everything that follows
+*/
 
 function isIntent(data, res, next) {
 	if (data.intent) {
@@ -79,25 +101,8 @@ function endOfChain(data, err, res) {
 	console.log("RES LOG :\n", res.log);
 	console.log("Error: ", err);
 	data.message.addReply(data.formattedAnswer);
-	sendAnswer(data.message);
-}
-
-function callMiddleware(data) {
-	let middlewareObject = Midware.create(endOfChain);
-
-	Midware.add(runLogicToOutput, middlewareObject);
-	Midware.add(Api.ifChuckJoke, middlewareObject);
-	if (!data.recast.replies.length) { // if recast doesn't fin any reply :my logic
-		Midware.add(isIntent, middlewareObject);
-		Midware.add(isEntity, middlewareObject);
-		Midware.add(isGazette, middlewareObject);
-	} else {
-		Midware.add(getRecastReply, middlewareObject);
-	}
-
-	Midware.run(data, {}, middlewareObject);
 }
 
 module.exports = {
-	reply: replyMessage,
+	callMiddleware
 }

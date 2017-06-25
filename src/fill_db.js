@@ -158,16 +158,18 @@ let allAnswers = {
 	resources_default: {
 		type: 'card',
 		content: {
-			title: 'Je pense que le mieux pour ça est que je te donne le site, tu y trouveras toutes les informations que tu cherches : des infos sur la team qui m\'a crée, sur le projet Speach, un formulaire de contact, quelques prototypes, et surtout en bas de page une brochure complète, regroupant des chiffres issus d\'études, les raisons pour lesquelles ce chatbot doit voir le jour, et bien plus encore :)'
+			title: 'Je pense que le mieux pour ça est que je te donne le site, tu y trouveras toutes les informations que tu cherches : des infos sur la team qui m\'a crée, sur le projet Speach, un formulaire de contact, quelques prototypes, et surtout en bas de page une brochure complète, regroupant des chiffres issus d\'études, les raisons pour lesquelles ce chatbot doit voir le jour, et bien plus encore :)',
 			subtitle: 'Speach.bot website',
 			imageUrl: '',
 			buttons: [
-				title: 'Lien vers le site',
-				type: 'web_url',
-				value: 'https://speach.bot'
+				{
+					title: 'Lien vers le site',
+					type: 'web_url',
+					value: 'https://speach.bot'
+				}
 			]
 		}
-	}
+	},
 
 /*
  * a default answer in case no intent is defined
@@ -198,11 +200,16 @@ let allAnswers = {
 	}
 };
 
-function getFullAnswersObject() {
-	return allAnswers;
+function getDbAnswers(data, res) {
+	if (allAnswers[data.answer_with_gazette])
+		data.formattedAnswer = allAnswers[data.answer_with_gazette];
+	else if (allAnswers[data.answer])
+		data.formattedAnswer = allAnswers[data.answer];
+	else
+		data.formattedAnswer = allAnswers['defaultAnswer'];
 }
 
 
 module.exports = {
-	getFullAnswersObject
+	getDbAnswers
 };

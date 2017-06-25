@@ -1,46 +1,55 @@
-function getIntent(result) {
-	let intent;
-
-	if(result.intents[0]) {
-		intent = result.intents[0].slug;
-		intent = intent.replace(/-([a-z])/g, function (g) {
-			return g[1].toUpperCase();
-		});
-	}
-	return intent;
+function resultToData(data, result, message) {
+	avoidPronounAndNumber(data, result);
+	console.log("+++++\n./message.result is :\n", JSON.stringify(result, null, 4), "\n");
+	getData(result, data);
+	data.message = message;
+	data.recast = result;
 }
 
-function getEntity(result) {
-	let entity;
+function getData(result, data) {
+	let confidence = 0;
+	let i = -1;
 
-	if (Object.keys(result.entities)[0]) {
-		entity = Object.keys(result.entities)[0];
-		entity = entity.replace(/-([a-z])/g, function (g) {
-			return g[1].toUpperCase();
-		});
+	while(result.intents[++i]) {
+		if (confidence < result.intents[i].confidence)
+			data.intent = result.intents[i].slug;
 	}
-	return entity;
+	confidence = 0;
+	for (let entityKey in result.entities) {
+		if (!result.entities.hasOwnProperty(entityKey))
+			continue;
+		let cur_entity = result.entities[entityKey]
+		if (cur_entity[0].confidence > confidence) {
+			data.entity = entityKey;
+			data.gazette = result.entities[entityKey][0].raw;
+		}
+	}
+	if (data.intent)
+		data.intent = data.intent.replace(/[- ']([a-z])/g, function (g) { return g[1].toUpperCase(); });
+	if (data.entity) {
+		data.entity = data.entity.replace(/[- ']([a-z])/g, function (g) { return g[1].toUpperCase(); });
+		data.gazette = data.gazette.replace(/"/g, "");
+		data.gazette = data.gazette.replace(/[- ']([a-z])/g, function (g) { return g[1].toUpperCase(); });
+	}
 }
 
-function getGazette(result) {
-	let entityObj = Object.keys(result.entities)[0];
-	let gazette;
-
-	if (result.entities[entityObj]) {
-		gazette = result.entities[entityObj][0].raw;
-		console.log(gazette);
-		gazette = gazette.replace(/-([a-z])/g, function (g) {
-			return g[1].toUpperCase();
-		});
+function avoidPronounAndNumber(data, result) {
+	for (let entityKey in result.entities) {
+		if (!result.entities.hasOwnProperty(entityKey)) continue;
+		let entity = result.entities[entityKey]
+		let gazette = entity[0].raw;
+		if(entityKey == 'Number')
+			delete result.entities[entityKey];
+		else if (entityKey == 'pronoun' && (gazette == 'Tu' || gazette == 'Vous' || gazette == 'tu' || gazette == 'vous'))
+		{
+			data.entity = 'bot';
+			data.gazette = 'bot';
+		}
 	}
-	return gazette;
 }
 
 module.exports = {
-	getIntent,
-	getEntity,
-	getGazette
-};
-
-// TODO store not only the first intent/entity but every single one OR
-// only retain the one with the highest confident rate.
+	resultToData,
+	getData,
+	avoidPronounAndNumber
+}

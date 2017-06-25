@@ -1,5 +1,5 @@
 /*
- * bot.js
+ * recast.js
  *
  * In this file:
  * - received message from a connected channel will be transformed with Recast.AI SDK
@@ -11,8 +11,11 @@
  */
 
 const recastai = require('recastai').default;
-const replyMessage = require('./message');
+const Process = require('./process_data');
+const Tools = require('./tools');
 const client = new recastai(process.env.REQUEST_TOKEN); // Instantiate Recast.AI SDK
+
+let data = {};
 
 /*
  * Main bot function
@@ -29,14 +32,39 @@ export const bot = (body, response, callback) => {
 		* - Return a response with the status code 200
 		* - Create a Message object, easily usable in your code
 		* - Call the 'replyMessage' function, with this Message object in parameter
-		*
-		* If you want to edit the behaviour of your code bot, depending on user input,
-		* go to /src/message.js file and write your own code under "YOUR OWN CODE" comment.
 		*/
-		client.connect.handleMessage({ body }, response, replyMessage);
+		client.connect.handleMessage({ body }, response, getReply);
 		// This function is called by Recast.AI hosting system when your code will be hosted
 		callback(null, { result: 'Bot got the message' });
 	} else {
 		callback('No text provided');
 	}
 };
+
+function getReply(message) {
+	// Instantiate Recast.AI SDK, just for request service
+	console.log('I receive: ', message.content);
+	const request = new recastai.request(process.env.REQUEST_TOKEN, process.env.LANGUAGE)
+
+	request.converseText(message.content, { conversationToken: message.senderId })
+	// Call Recast.AI SDK, through /converse route
+	.then((result) => {
+		Tools.resultToData(data, result, message);
+		Process.callMiddleware(data);
+		sendReplies(data.message);
+	})
+	.catch((err) => {
+		console.error('Error while sending message to Recast.AI', err);
+	})
+};
+
+function sendReplies(message) {
+	// Send all replies
+	message.reply()
+	.then(() => {
+		// EDITION PHASE 3 : add some code after the answer has been sent
+	})
+	.catch((err) => {
+		console.error('Error while sending message to channel', err);
+	})
+}
