@@ -51,6 +51,7 @@ function getRecastReply(data, err, res) {
 	console.log('Reponse par le builder :) : ' + data.recast.replies[0]);
 	data.recast.replies[0] = data.recast.replies[0].replace(/\\n/g, '\n');
 	data.recast.replies.forEach((replyContent) => data.message.addReply({type: 'text', content: replyContent}));
+	data.message.addReply(Db.getDbAnswers(data, 'defaultAnswer'));
 }
 
 /*
@@ -94,13 +95,15 @@ function isGazette(data, res, next) {
 }
 
 function endOfChain(data, err, res) {
-	Db.getDbAnswers(data, res);
+	data.formattedAnswer = Db.getDbAnswers(data.answer, data.answer_with_gazette);
 	res.addToLog("Answer sent : ", data.formattedAnswer);
 	console.log("++++\n", data, "\n+++++")
 	console.log("data.answer = ", data.answer);
 	console.log("RES LOG :\n", res.log);
 	console.log("Error: ", err);
 	data.message.addReply(data.formattedAnswer);
+	if (data.formattedAnswer.type == 'text') // send default message to relance if output is of type text
+		data.message.addReply(Db.getDbAnswers('defaultAnswer'));
 }
 
 module.exports = {

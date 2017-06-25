@@ -200,13 +200,13 @@ let allAnswers = {
 	}
 };
 
-function getDbAnswers(data, res) {
-	if (allAnswers[data.answer_with_gazette])
-		data.formattedAnswer = allAnswers[data.answer_with_gazette];
-	else if (allAnswers[data.answer])
-		data.formattedAnswer = allAnswers[data.answer];
+function getDbAnswers(answer, answer_with_gazette) {
+	if (allAnswers[answer_with_gazette])
+		return(allAnswers[answer_with_gazette]);
+	else if (allAnswers[answer])
+		return(allAnswers[answer]);
 	else
-		data.formattedAnswer = allAnswers['defaultAnswer'];
+		return(allAnswers['defaultAnswer']);
 }
 
 
