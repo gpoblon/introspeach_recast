@@ -15,8 +15,9 @@ function ifChuckJokeAskApi(data, res, next) {
 			next(data, res, false);
 		});
 	}
-	else
+	else {
 		next(data, res, true);
+	}
 }
 
 // I'm not proud of it

@@ -36,7 +36,6 @@ app.use('/', (request, response) => {
 				response.sendStatus(400);
 			}
 		} else if (success) {
-			console.log(success);
 			if (!response.headersSent) {
 				response.status(200).json(success);
 			}

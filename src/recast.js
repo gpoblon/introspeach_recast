@@ -15,7 +15,6 @@ const Process = require('./process_data');
 const Tools = require('./tools');
 const client = new recastai(process.env.REQUEST_TOKEN); // Instantiate Recast.AI SDK
 
-let data = {};
 
 /*
  * Main bot function
@@ -35,7 +34,7 @@ export const bot = (body, response, callback) => {
 		*/
 		client.connect.handleMessage({ body }, response, getReply);
 		// This function is called by Recast.AI hosting system when your code will be hosted
-		callback(null, { result: 'Bot got the message' });
+		callback(null, { result: 'new message from Speach' });
 	} else {
 		callback('No text provided');
 	}
@@ -43,15 +42,15 @@ export const bot = (body, response, callback) => {
 
 function getReply(message) {
 	// Instantiate Recast.AI SDK, just for request service
-	console.log('I receive: ', message.content);
 	const request = new recastai.request(process.env.REQUEST_TOKEN, process.env.LANGUAGE)
 
 	request.converseText(message.content, { conversationToken: message.senderId })
 	// Call Recast.AI SDK, through /converse route
 	.then((result) => {
+		let data = {};
 		Tools.resultToData(data, result, message);
 		Process.callMiddleware(data);
-		sendReplies(data.message);
+		sendReplies(message);
 	})
 	.catch((err) => {
 		console.error('Error while sending message to Recast.AI', err);

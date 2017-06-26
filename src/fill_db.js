@@ -200,13 +200,18 @@ let allAnswers = {
 	}
 };
 
-function getDbAnswers(answer, answer_with_gazette) {
-	if (allAnswers[answer_with_gazette])
+function getDbAnswers(res, answer, answer_with_gazette) {
+	res.addToLog("getDbAnswers receives: " + answer + " & " + answer_with_gazette);
+	if (allAnswers[answer_with_gazette]) {
+		res.addToLog("getDbAnswers returns: " + answer_with_gazette);
 		return(allAnswers[answer_with_gazette]);
-	else if (allAnswers[answer])
+	} else if (allAnswers[answer]) {
+		res.addToLog("getDbAnswers returns: " + answer);
 		return(allAnswers[answer]);
-	else
+	} else {
+		res.addToLog("getDbAnswers returns: defaultAnswer");
 		return(allAnswers['defaultAnswer']);
+	}
 }
 
 

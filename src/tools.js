@@ -1,6 +1,5 @@
 function resultToData(data, result, message) {
 	avoidPronounAndNumber(data, result);
-	console.log("+++++\n./message.result is :\n", JSON.stringify(result, null, 4), "\n");
 	getData(result, data);
 	data.message = message;
 	data.recast = result;
@@ -50,6 +49,4 @@ function avoidPronounAndNumber(data, result) {
 
 module.exports = {
 	resultToData,
-	getData,
-	avoidPronounAndNumber
 }
