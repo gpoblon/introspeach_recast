@@ -22,9 +22,6 @@ const app = express();
 app.set('port', process.env.PORT || 5000);
 app.use(bodyParser.json());
 
-//const mongoose = require('mongoose');
-//mongoose.connect('mongodb://163.172.218.236:3000/introspeach');
-
 // Handle / route
 app.use('/', (request, response) => {
 	// Call bot main function

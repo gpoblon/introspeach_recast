@@ -47,23 +47,13 @@ function getReply(message) {
 	request.converseText(message.content, { conversationToken: message.senderId })
 	// Call Recast.AI SDK, through /converse route
 	.then((result) => {
-		let data = {};
+		let data = {
+			answers: {}
+		};
 		Tools.resultToData(data, result, message);
 		Process.callMiddleware(data);
-		sendReplies(message);
 	})
 	.catch((err) => {
 		console.error('Error while sending message to Recast.AI', err);
 	})
 };
-
-function sendReplies(message) {
-	// Send all replies
-	message.reply()
-	.then(() => {
-		// EDITION PHASE 3 : add some code after the answer has been sent
-	})
-	.catch((err) => {
-		console.error('Error while sending message to channel', err);
-	})
-}

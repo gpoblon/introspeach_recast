@@ -13,7 +13,7 @@
  *		The answer has been sent back: so here do whatever logic the doesn't imply to change the output.
  */
 
-const Db = require('./fill_db');
+const Db = require('./db');
 const Api = require('./api');
 const Midware = require('./middleware');
 
@@ -48,9 +48,11 @@ function runLogicToOutput(data, res, next) {
  * It's PHASE 2
 */
 function getRecastReply(data, res, next) {
-	res.addToLog("Answer by Recast builder : ", data.recast.replies[0].content);
-	data.recast.replies[0] = data.recast.replies[0].replace(/\\n/g, '\n');
-	data.recast.replies.forEach((replyContent) => data.message.addReply({type: 'text', content: replyContent}));
+	data.answers.recast = {
+		type: 'text',
+		content: data.recast.replies[0].replace(/\\n/g, '\n')
+	};
+	res.addToLog("Answer by Recast builder : " + data.answers.recast.content);
 	next(data, res, true);
 }
 
@@ -61,7 +63,6 @@ function getRecastReply(data, res, next) {
 
 function isIntent(data, res, next) {
 	if (data.intent) {
-		data.answer = data.intent;
 		res.addToLog("Intent: " + data.intent);
 		next(data, res, true);
 	} else {
@@ -73,7 +74,6 @@ function isIntent(data, res, next) {
 
 function isEntity(data, res, next) {
 	if (data.entity) {
-		data.answer += '_' + data.entity;
 		res.addToLog("Entity: " + data.entity);
 		next(data, res, true);
 	} else {
@@ -85,7 +85,6 @@ function isEntity(data, res, next) {
 
 function isGazette(data, res, next) {
 	if (data.gazette) {
-		data.answer_with_gazette = data.answer + '_' + data.gazette;
 		res.addToLog("Gazette : " + data.gazette);
 		next(data, res, true);
 	} else {
@@ -95,17 +94,36 @@ function isGazette(data, res, next) {
 }
 
 function endOfChain(data, err, res) {
-	console.log("+++++++++")
 	res.addToLog('In end of chain...');
-	if (!data.formattedAnswer) {
-			data.formattedAnswer = Db.getDbAnswers(res, data.answer, data.answer_with_gazette);
-	}
-	console.log(data.formattedAnswer);
-	console.log(res.log);
 
-	//data.message.addReply(data.formattedAnswer);
-	//	if (data.formattedAnswer.type == 'text') // send default message to relance if output is of type text
-		//		data.message.addReply(Db.getDbAnswers(res, 'defaultAnswer'));
+	console.log("intent: " + data.intent);
+	console.log("entity: " + data.entity);
+	console.log("gazette: " + data.gazette);
+	if(!data.answers.recast && !data.answers.api) {
+		// if none has been called: call Db to fin the answer and eventually do some code
+		console.log("db call");
+		Db.getDbAnswers(data, proceedReplies);
+	}
+	if (data.answers.recast || data.answers.api || (data.answers.db && data.answers.db.type == 'text')) {
+		Db.getDbDefaultAnswer(data, proceedReplies);
+	}
+}
+
+function proceedReplies(err, data) {
+	console.log("=-=-=-=-");
+	Object.keys(data.answers).forEach((source) => {
+		console.log(data.answers[source]);
+		console.log('\n');
+			data.message.addReply(data.answers[source]);
+		});
+	console.log("-=-=-=-");
+	data.message.reply()
+	.then(() => {
+		// EDITION PHASE 3 : add some code after the answer has been sent
+	})
+	.catch((err) => {
+		console.error('Error while sending message to channel', err);
+	})
 }
 
 module.exports = {

@@ -3,12 +3,12 @@ const request = require('request');
 function ifChuckJokeAskApi(data, res, next) {
 	// ?firstName=John&amp;lastName=Doe
 
-	if (data.intent == 'askJoke' || data.entity == 'chuckNorris') {
+	if (data.intent == 'ask-joke' || data.entity == 'chuck-norris') {
 		request('http://www.chucknorrisfacts.fr/api/get?data=tri:alea;type:text;nb:1', (error, result, body) => {
 			body = JSON.parse(body);
 			let joke = body[0].fact;
 			joke = htmlToUtf8(joke);
-			data.formattedAnswer = {
+			data.answers.api = {
 				type: 'text',
 				content: joke
 			};

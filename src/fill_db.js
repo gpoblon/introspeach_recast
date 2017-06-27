@@ -32,11 +32,15 @@ let allAnswers = {
  *
 */
 	defineWord_bot: {
+		entity: 'bot',
+		gazette: '',
 		type: 'text',
 		content: 'Un chatbot c\'est un programme informatique qui est utilisé pour répondre à des questions de personnes. Il remplace l\'homme. Le notre comprend le sens des phrases. Partant de là beaucoup de travail de saisie par des professionnels de la santé et du sexe pour répondre à toutes les questions que tu te poses... :)'
 	},
 
 	defineWord_default: {
+		entity: '',
+		gazette: '',
 		type: 'text',
 		content: 'Je n\'ai pas compris ce que tu voulais que je t\'explique, désolé !'
 	},
@@ -48,16 +52,22 @@ let allAnswers = {
  *
 */
 	reasonWhy_bot: {
+		entity: 'bot',
+		gazette: '',
 		type: 'text',
 		content: '2 raisons. Déjà, tu te poses des questions de cul tous les jours.\nEnsuite, la société ne t\'aide pas à découvrir la sexualité sainement : trop peu d\'informations, trop peu de gens avec qui en parler sans tabou. Les vidéos que tu peux voir, ce que tes amis te racontent, c\'est souvent loin de la réalité.\n Voilà pourquoi Speach. Lui il pourra t\'aider à répondre à toutes les questions que tu te poses, sans gène, sans jugement :)'
 	},
 
 	reasonWhy_subject: {
+		entity: 'subject',
+		gazette: '',
 		type: 'text',
 		content: 'Notre logo est une pêche (peach en anglais). Les pêches familièrement c\'est les fesses, un organe commun aux gars et filles. S pour sexe / sexualité. Speach aussi ressemble a speech, top pour un chatbot ! B|'
 	},
 
 	reasonWhy_default: {
+		entity: '',
+		gazette: '',
 		type: 'text',
 		content: 'Oula, je n\'ai pas la réponse à tous les pourquoi !'
 	},
@@ -69,6 +79,8 @@ let allAnswers = {
  *
 */
 	wantHelp_subject: {
+		entity: 'subject',
+		gazette: '',
 		type: 'quickReplies',
 		content: {
 			title: 'Speach c\'est ton e-ami calé en sexe ! Tu pourras lui demander ce que tu veux en lien avec le sexe. Il t\'accompagnera dans la découverte de ta vie d\'adulte. Si tu imagines un arbre, voici les 5 branches principales :',
@@ -98,31 +110,44 @@ let allAnswers = {
 	},
 
 	wantHelp_subject_brancheLAmourEtLeSexe: {
+		entity: 'subject',
+		gazette: 'brancheLAmourEtLeSexe',
 		type: 'text',
 		content: 'Les deux notions sont liées. Speach pourra te parler de dépendance affective, de jalousie, de rupture, d\'attirance, de friendzone, de fidélité, de savoir quel est le bon moment pour passer à l\'acte par exemple.'
 	},
 
 	wantHelp_subject_brancheLePlaisir: {
+		entity: 'subject',
+		gazette: 'brancheLePlaisir',
 		type: 'text',
 		content: 'Le plaisir est un aspect central car il est lié à tous les autres (première fois, amour, etc). Bien sur les sujets directs seront : se donner du plaisir seul ou à plusieurs (des conseils, des explications), les fantasmes, les pratiques sexuelles, et plein d\'autres choses...'
 	},
 
 	wantHelp_subject_brancheLesPremieresFois: {
+		entity: 'subject',
+		gazette: 'brancheLesPremieresFois',
 		type: 'text',
 		content: 'Bien sur il y aura d\'autres sujets mais, évidemment, tu pourras poser plein de questions sur LA première fois ;).\nSpeach t\'aidera à éviter certains pièges et à faire ça bien, à te préparer au mieux pour ce moment!'
 	},
 
 	wantHelp_subject_brancheSoiMêmeEtLesAutres: {
+		entity: 'subject',
+		gazette: 'brancheSoiMêmeEtLesAutres',
+		entity: 'subject',
 		type: 'text',
 		content: 'Un sujet très sensible. Speach te dira jamais que tu es gay ou ce genre de choses. Mais si tu t\'interroge, Speach pourra te guider un peu et t\'aider à te poser les bonnes questions :)'
 	},
 
 	wantHelp_subject_branchePréventionEtContraception: {
+		entity: 'subject',
+		gazette: 'branchePréventionEtContraception',
 		type: 'text',
 		content: 'C\'est un sujet omniprésent dans le sexe. Les jeunes ne sont pas assez avertis des risques ni des bons usages de précaution, et ne savent pas gérer les conséquences en cas de problème.\n Speach sera alors d\'une grande aide et saura informer mais aussi proposer des solutions, comme :\nQue faire dans l\'urgence si la capote a craqué ?'
 	},
 
 	wantHelp_bot: {
+		entity: 'bot',
+		gazette: '',
 		type: 'card',
 		content: {
 			title: 'Je peux t\'informer sur ces divers sujets',
@@ -147,6 +172,8 @@ let allAnswers = {
 	},
 
 	wantHelp_default: {
+		entity: '',
+		gazette: '',
 		type: 'text',
 		content: 'J\'aimerais t\'aider mais j\'ai pas compris ta demande'
 	},
@@ -156,6 +183,8 @@ let allAnswers = {
 */
 
 	resources_default: {
+		entity: '',
+		gazette: '',
 		type: 'card',
 		content: {
 			title: 'Je pense que le mieux pour ça est que je te donne le site, tu y trouveras toutes les informations que tu cherches : des infos sur la team qui m\'a crée, sur le projet Speach, un formulaire de contact, quelques prototypes, et surtout en bas de page une brochure complète, regroupant des chiffres issus d\'études, les raisons pour lesquelles ce chatbot doit voir le jour, et bien plus encore :)',
@@ -175,6 +204,8 @@ let allAnswers = {
  * a default answer in case no intent is defined
 */
 	defaultAnswer: {
+		entity: '',
+		gazette: '',
 		type: 'quickReplies',
 		content: {
 			title: 'Voici certains sujets dont on peut parler toi et moi ;)',

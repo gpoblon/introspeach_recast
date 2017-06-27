@@ -23,10 +23,7 @@ function getData(result, data) {
 			data.gazette = result.entities[entityKey][0].raw;
 		}
 	}
-	if (data.intent)
-		data.intent = data.intent.replace(/[- ']([a-z])/g, function (g) { return g[1].toUpperCase(); });
 	if (data.entity) {
-		data.entity = data.entity.replace(/[- ']([a-z])/g, function (g) { return g[1].toUpperCase(); });
 		data.gazette = data.gazette.replace(/"/g, "");
 		data.gazette = data.gazette.replace(/[- ']([a-z])/g, function (g) { return g[1].toUpperCase(); });
 	}
