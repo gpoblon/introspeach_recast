@@ -96,6 +96,7 @@ function isGazette(data, res, next) {
 function endOfChain(data, err, res) {
 	res.addToLog('In end of chain...');
 
+	console.log(data.recast);
 	console.log("intent: " + data.intent);
 	console.log("entity: " + data.entity);
 	console.log("gazette: " + data.gazette);
