@@ -16,6 +16,7 @@ const bot = require('./recast').bot;
 
 const express = require('express');
 const bodyParser = require('body-parser');
+
 // Start Express server
 const app = express();
 
@@ -25,7 +26,7 @@ app.use(bodyParser.json());
 // Handle / route
 app.use('/', (request, response) => {
 	// Call bot main function
-	console.log("\n---------------------------------\n")
+	console.log("\n---------------------------------\n");
 	bot(request.body, response, (error, success) => {
 		if (error) {
 			console.log('Error in your bot:', error);

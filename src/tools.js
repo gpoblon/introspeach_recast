@@ -1,7 +1,8 @@
 function resultToData(data, result, message) {
 	avoidPronounAndNumber(data, result);
 	getData(result, data);
-	data.message = message;
+  data.message = message;
+  data.user.answer = message.content;
 	data.recast = result;
 }
 
@@ -18,7 +19,7 @@ function getData(result, data) {
 		if (!result.entities.hasOwnProperty(entityKey))
 			continue;
 		let cur_entity = result.entities[entityKey]
-		if (cur_entity[0].confidence > confidence) {
+		if (cur_entity[0].confidence > confidence && entityKey != 'pronoun' && entityKey != 'number') {
 			data.entity = entityKey;
 			data.gazette = result.entities[entityKey][0].raw;
 		}

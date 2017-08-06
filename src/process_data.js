@@ -21,16 +21,18 @@ function callMiddleware(data) {
 	let middlewareObject = Midware.create(endOfChain);
 
 	Midware.add(runLogicToOutput, middlewareObject);
-	Midware.add(Api.ifChuckJoke, middlewareObject);
-	if (!data.recast.replies.length) { // if recast doesn't fin any reply :my logic
-		Midware.add(isIntent, middlewareObject);
-		Midware.add(isEntity, middlewareObject);
-		Midware.add(isGazette, middlewareObject);
-	} else {
-		Midware.add(getRecastReply, middlewareObject);
-	}
+  Midware.add(Api.ifChuckJoke, middlewareObject);
+  Midware.add(Db.getUserData, middlewareObject);
+  Midware.add(Db.updateDbAfterQuestion, middlewareObject);
+  if (!data.recast.replies.length) {
+    Midware.add(isIntent, middlewareObject);
+    Midware.add(isEntity, middlewareObject);
+    Midware.add(isGazette, middlewareObject);
+  } else {
+      Midware.add(getRecastReply, middlewareObject);
+  }
 
-	Midware.run(data, {}, middlewareObject);
+  Midware.run(data, {}, middlewareObject);
 }
 
 /*
@@ -39,21 +41,24 @@ function callMiddleware(data) {
  */
 
 function runLogicToOutput(data, res, next) {
-	res.addToLog("Entering in my middleware chain...");
+  res.addToLog("Entering in my middleware chain...");
 	next(data, res, true);
 }
 
 /*
  * Use this function only if recast has a reply to send
  * It's PHASE 2
-*/
+ */
+
 function getRecastReply(data, res, next) {
-	data.answers.recast = {
+  if(data.recast.replies.length) {
+    data.answers.recast = {
 		type: 'text',
 		content: data.recast.replies[0].replace(/\\n/g, '\n')
-	};
-	res.addToLog("Answer by Recast builder : " + data.answers.recast.content);
-	next(data, res, true);
+	  };
+	  res.addToLog("Answer by Recast builder : " + data.answers.recast.content);
+  }
+  next(data, res, true);
 }
 
 /*
@@ -62,63 +67,71 @@ function getRecastReply(data, res, next) {
 */
 
 function isIntent(data, res, next) {
-	if (data.intent) {
-		res.addToLog("Intent: " + data.intent);
-		next(data, res, true);
-	} else {
-		data.answer = 'defaultAnswer';
-		res.addToLog("no intent found. Stop there");
-		next(data, res, false);
-	}
+  if (data.intent) {
+    console.log(data.intent);
+    res.addToLog("Intent: " + data.intent);
+    next(data, res, true);
+  } else {
+    data.defaultAnswer = true;
+    data.answer = 'defaultAnswer';
+    res.addToLog("no intent found. Stop there");
+    next(data, res, false);
+  }
 }
 
 function isEntity(data, res, next) {
-	if (data.entity) {
-		res.addToLog("Entity: " + data.entity);
-		next(data, res, true);
-	} else {
-		data.answer += '_default';
-		res.addToLog("no entity found. Stop there");
-		next(data, res, false);
-	}
+  if (data.entity) {
+    res.addToLog("Entity: " + data.entity);
+    next(data, res, true);
+  } else {
+    data.answer += '_default';
+    res.addToLog("no entity found. Stop there");
+    next(data, res, false);
+  }
 }
 
 function isGazette(data, res, next) {
-	if (data.gazette) {
-		res.addToLog("Gazette : " + data.gazette);
-		next(data, res, true);
-	} else {
-		res.addToLog("No gazette found. Stop there.")
-		next(data, res, false);
-	}
+  if (data.gazette) {
+    res.addToLog("Gazette : " + data.gazette);
+    next(data, res, true);
+  } else {
+    res.addToLog("No gazette found. Stop there.")
+    next(data, res, false);
+  }
 }
 
 function endOfChain(data, err, res) {
 	res.addToLog('In end of chain...');
 
-	console.log(data.recast);
-	console.log("intent: " + data.intent);
-	console.log("entity: " + data.entity);
-	console.log("gazette: " + data.gazette);
-	if(!data.answers.recast && !data.answers.api) {
-		// if none has been called: call Db to fin the answer and eventually do some code
-		console.log("db call");
-		Db.getDbAnswers(data, proceedReplies);
-	}
-	if (data.answers.recast || data.answers.api || (data.answers.db && data.answers.db.type == 'text')) {
-		Db.getDbDefaultAnswer(data, proceedReplies);
-	}
+  console.log(data.recast.intents);
+  if(!data.answers.recast && !data.user.q_status && !data.answers.api && !data.defaultAnswer) {
+		// if none has been called: call Db to find the answer and eventually do some code
+		console.log("Db call.");
+    Db.getDbAnswers(data, proceedReplies);
+  } else if (data.user.q_status) {
+    console.log(`proceed reply from questions : ${data.user.q_status}`);
+    Db.askQuestion(data, proceedReplies);
+  } else if (data.answers.recast) {
+    console.log(`proceed recast reply`);
+    proceedReplies(null, data);
+  } else {
+    console.log(`proceed default reply`);
+    Db.getDbDefaultAnswer(data, proceedReplies);
+  }
 }
 
 function proceedReplies(err, data) {
-	console.log("=-=-=-=-");
+  console.log("=-=-=-=-");
+  console.log(data.answers);
 	Object.keys(data.answers).forEach((source) => {
+		console.log(`intent: ${data.intent}`);
+  	console.log(`entity: ${data.entity}`);
 		console.log(data.answers[source]);
 		console.log('\n');
 			data.message.addReply(data.answers[source]);
 		});
 	console.log("-=-=-=-");
-	data.message.reply()
+  data.message.reply()
 	.then(() => {
 		// EDITION PHASE 3 : add some code after the answer has been sent
 	})

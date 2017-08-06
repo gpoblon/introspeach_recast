@@ -1,5 +1,5 @@
 /*
- * recast.js
+ ddddddddd* recast.js
  *
  * In this file:
  * - received message from a connected channel will be transformed with Recast.AI SDK
@@ -48,9 +48,15 @@ function getReply(message) {
 	// Call Recast.AI SDK, through /converse route
 	.then((result) => {
 		let data = {
-			answers: {}
-		};
-		Tools.resultToData(data, result, message);
+      answers: {},
+      defaultAnswer: false,
+      user: {
+        id: message.senderId,
+        q_status: false,
+        q_ref: 0
+      }
+    };
+    Tools.resultToData(data, result, message);
 		Process.callMiddleware(data);
 	})
 	.catch((err) => {
