@@ -79,10 +79,11 @@ function updateDbAfterQuestion(data, result, next) {
     if (data.user.q_ref == -1) {
       data.user.q_status = false;
     }
-    if (data.user.q_status == true  && data.user.q_ref < 3) {
+    if (data.user.q_status == true && data.user.q_ref < data.q_max) {
       data.user.q_ref += 1;
-    } else if (data.user.q_ref == 3) {
+    } else if (data.user.q_ref == data.q_max) {
       data.user.q_ref = -1;
+      data.user.q_status = false;
     }
     db.collection('users').update(
       { _id: data.user.id },

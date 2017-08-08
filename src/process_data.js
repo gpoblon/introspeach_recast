@@ -42,6 +42,8 @@ function callMiddleware(data) {
 
 function runLogicToOutput(data, res, next) {
   res.addToLog("Entering in my middleware chain...");
+
+  data.q_max = 6;
 	next(data, res, true);
 }
 
@@ -51,7 +53,7 @@ function runLogicToOutput(data, res, next) {
  */
 
 function getRecastReply(data, res, next) {
-  if(data.recast.replies.length) {
+  if(data.recast.replies.length && data.user.q_status == false) {
     data.answers.recast = {
 		type: 'text',
 		content: data.recast.replies[0].replace(/\\n/g, '\n')
